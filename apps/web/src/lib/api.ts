@@ -32,10 +32,53 @@ export interface Job {
   description: string;
   category: string;
   price: string;
-  status: string;
+  status: 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
   location: string;
   createdAt: string;
   updatedAt: string;
+  acceptedAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+export interface Review {
+  id: string;
+  jobId: string;
+  providerId: string;
+  customerId: string;
+  rating: number;
+  comment: string;
+  quality?: number;
+  punctuality?: number;
+  behaviour?: number;
+  createdAt: string;
+}
+
+export interface ProviderProfile {
+  id: string;
+  userId: string;
+  category: string;
+  rating: number;
+  totalJobs: number;
+  completionRate: number;
+  punctualityRate: number;
+  skills: string[];
+  bio?: string;
+  hourlyRate?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LedgerEntry {
+  id: string;
+  userId: string;
+  type: string;
+  amount: string;
+  currency: string;
+  status: string;
+  description: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
 }
 
 class ApiClient {
