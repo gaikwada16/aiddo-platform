@@ -1,52 +1,57 @@
-export type LedgerEntryType =
-  | 'CUSTOMER_PAYMENT'
-  | 'PROVIDER_EARNING'
-  | 'PLATFORM_FEE'
-  | 'BONUS'
-  | 'BENEFIT'
-  | 'REFUND'
-  | 'WITHDRAWAL'
-  | 'ADJUSTMENT';
+import { PrismaClient, LedgerEntryStatus, LedgerEntryType } from '@prisma/client';
 
-export interface LedgerEntry {
-  id: string;
-  transactionId: string;
+const prisma = new PrismaClient();
+
+export type PostLedgerEntryInput = {
   userId: string;
-  jobId?: string;
-  type: LedgerEntryType;
+  type: LedgerEntryType | keyof typeof LedgerEntryType;
   amount: number;
-  currency: string;
-  status: 'PENDING' | 'POSTED' | 'REVERSED';
+  currency?: string;
   description: string;
-  metadata: Record<string, unknown>;
-  createdAt: Date;
-}
+  jobId?: string | null;
+  metadata?: Record<string, unknown>;
+  transactionId?: string | null;
+};
 
 export class LedgerService {
-  private entries: LedgerEntry[] = [];
-
-  createEntry(input: Omit<LedgerEntry, 'id' | 'createdAt'>): LedgerEntry {
-    const entry: LedgerEntry = {
-      ...input,
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-    };
-
-    this.entries.push(entry);
-    return entry;
+  async postEntry({
+    userId,
+    type,
+    amount,
+    currency = 'INR',
+    description,
+    jobId,
+    metadata = {},
+    transactionId,
+  }: PostLedgerEntryInput) {
+    return prisma.ledgerEntry.create({
+      data: {
+        userId,
+        jobId: jobId ?? null,
+        transactionId: transactionId ?? undefined,
+        type: typeof type === 'string' ? (type as LedgerEntryType) : LedgerEntryType[type],
+        amount,
+        currency,
+        description,
+        metadata,
+        status: LedgerEntryStatus.POSTED,
+      },
+    });
   }
 
-  listByUser(userId: string): LedgerEntry[] {
-    return this.entries.filter((entry) => entry.userId === userId);
-  }
+  async getBalanceForUser(userId: string) {
+    const result = await prisma.ledgerEntry.aggregate({
+      where: {
+        userId,
+        status: {
+          not: LedgerEntryStatus.REVERSED,
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
 
-  listByJob(jobId: string): LedgerEntry[] {
-    return this.entries.filter((entry) => entry.jobId === jobId);
-  }
-
-  balanceForUser(userId: string): number {
-    return this.entries
-      .filter((entry) => entry.userId === userId && entry.status !== 'REVERSED')
-      .reduce((sum, entry) => sum + Number(entry.amount), 0);
+    return result._sum.amount ?? 0;
   }
 }
