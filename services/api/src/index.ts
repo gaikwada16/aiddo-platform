@@ -1,9 +1,11 @@
 import express from 'express';
+import authRoutes from './modules/auth/auth.routes.js';
+import { env } from './config/env.js';
 
 const app = express();
-const port = Number(process.env.API_PORT ?? 3000);
 
 app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({
@@ -21,6 +23,10 @@ app.get('/', (_req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`AIDDO API listening on http://localhost:${port}`);
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  res.status(500).json({ error: err.message || 'Internal Server Error' });
+});
+
+app.listen(env.port, () => {
+  console.log(`AIDDO API listening on http://localhost:${env.port}`);
 });

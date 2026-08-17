@@ -4,6 +4,11 @@
   "description": "AI-Driven Person-to-Person Service Marketplace",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",

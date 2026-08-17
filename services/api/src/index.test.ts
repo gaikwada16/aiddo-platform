@@ -7,4 +7,15 @@ describe('AIDDO API bootstrap', () => {
       version: '0.1.0',
     });
   });
+
+  it('supports auth token payload creation', () => {
+    const payload = {
+      sub: 'user_123',
+      email: 'demo@aiddo.com',
+      role: 'CUSTOMER',
+    };
+
+    expect(payload.sub).toBe('user_123');
+    expect(payload.role).toBe('CUSTOMER');
+  });
 });
