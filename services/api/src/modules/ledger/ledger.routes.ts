@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { LedgerService } from './ledger.service.js';
 import { validateBody } from '../../middleware/validate.js';
+import { requireAuth } from '../../middleware/auth.middleware.js';
 
 const router = Router();
 const ledgerService = new LedgerService();
@@ -26,7 +27,7 @@ const postEntrySchema = z.object({
   transactionId: z.string().optional(),
 });
 
-router.post('/', validateBody(postEntrySchema), async (req, res) => {
+router.post('/', requireAuth, validateBody(postEntrySchema), async (req, res) => {
   try {
     const entry = await ledgerService.postEntry(req.body);
     res.status(201).json(entry);
@@ -36,7 +37,7 @@ router.post('/', validateBody(postEntrySchema), async (req, res) => {
   }
 });
 
-router.get('/balance/:userId', async (req, res) => {
+router.get('/balance/:userId', requireAuth, async (req, res) => {
   try {
     const balance = await ledgerService.getBalanceForUser(req.params.userId);
     res.status(200).json({ userId: req.params.userId, balance });

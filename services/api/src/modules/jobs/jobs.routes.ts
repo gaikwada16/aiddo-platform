@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { JobsService } from './jobs.service.js';
 import { validateBody } from '../../middleware/validate.js';
+import { requireAuth } from '../../middleware/auth.middleware.js';
 
 const router = Router();
 const jobsService = new JobsService();
@@ -15,7 +16,7 @@ const createJobSchema = z.object({
   location: z.string().optional(),
 });
 
-router.post('/', validateBody(createJobSchema), async (req, res) => {
+router.post('/', requireAuth, validateBody(createJobSchema), async (req, res) => {
   try {
     const job = await jobsService.createJob(req.body);
     res.status(201).json(job);
