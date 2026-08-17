@@ -1,0 +1,15 @@
+{
+  "name": "@aiddo/database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prisma": "prisma",
+    "db:push": "prisma db push",
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.0",
+    "prisma": "^5.16.0"
+  }
+}

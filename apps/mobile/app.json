@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "AIDDO Mobile",
+    "slug": "aiddo-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "experiments": {
+      "tsconfigPaths": true
+    }
+  }
+}
